@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Voucher Anexo 5 Sistema Red</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/static/base.css">
+<style>
+:root{--side:#16324f;--side-ink:#ffffff;--side-soft:#0f2338;--side-line:#2c4c6e;--side-lbl:#cfe0f1}
+@media (prefers-color-scheme: dark){:root{--side:#0f1d2c;--side-soft:#0a1420;--side-line:#24405e}}
+html,body{height:100%}
+.app{display:grid;grid-template-columns:300px 1fr;min-height:100%}
+aside{background:var(--side);color:var(--side-ink);padding:22px max(18px,env(safe-area-inset-left)) 22px 18px;display:flex;flex-direction:column;gap:16px}
+aside .brand b{font-size:18px;display:block;letter-spacing:.01em}
+aside .brand small{font-size:12px;opacity:.7}
+aside label,aside .lbl{color:var(--side-lbl)}
+aside select{background:var(--side-soft);color:var(--side-ink);border-color:var(--side-line)}
+aside select option{color:#1b1f24;background:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13px;font-family:var(--f-mono);border:1px solid var(--side-line);background:var(--side-soft);color:var(--side-ink);padding:4px 10px;border-radius:999px}
+.chip[aria-pressed="true"]{background:var(--side-ink);color:var(--side);border-color:var(--side-ink);font-weight:500}
+.chip:disabled{opacity:.4;cursor:default}
+.mini{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mini span{display:flex;gap:4px}
+.mini button{font-size:11.5px;background:none;border:0;color:var(--side-lbl);text-decoration:underline;padding:2px 4px}
+.q{background:var(--side-soft)!important;color:var(--side-ink)!important;border-color:var(--side-line)!important;padding:6px 9px!important;font-size:13px}
+.servs{max-height:34vh;overflow:auto;padding:2px}
+.foot{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;font-size:13px;padding-top:10px;border-top:1px solid var(--side-line)}
+.foot a,.foot button{color:var(--side-ink);background:none;border:1px solid var(--side-line);border-radius:999px;padding:5px 12px;text-decoration:none}
+main{padding:22px max(18px,env(safe-area-inset-right)) 40px 22px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.head h1{font-size:20px}
+.sel{display:flex;flex-wrap:wrap;gap:6px}
+.sel span{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--chip);border:1px solid var(--line)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpi b{display:block;font-size:24px;font-family:var(--f-mono);font-weight:500}
+.kpi span{font-size:12.5px;color:var(--muted)}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.go{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+@media (max-width:860px){.app{grid-template-columns:1fr}.servs{max-height:none}.foot{margin-top:0}}
+@media (max-width:520px){.kpis{grid-template-columns:1fr 1fr}}
+</style></head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand"><b>Anexo 5 · Sistema Red</b><small>Generador de vouchers</small></div>
+    <div class="field"><label for="unidad">Unidad</label><select id="unidad"></select></div>
+    <div class="field"><label for="ciclo">Ciclo</label><select id="ciclo"></select></div>
+    <div class="field"><label for="tipo">Tipo día</label><select id="tipo"></select></div>
+    <div class="field">
+      <div class="mini"><span class="lbl">Servicio</span><span><button type="button" data-all="serv">Todos</button><button type="button" data-none="serv">Ninguno</button></span></div>
+      <input type="text" class="q" id="q" placeholder="Buscar servicio" aria-label="Buscar servicio">
+      <div class="chips servs" id="serv"></div>
+    </div>
+    <div class="field">
+      <div class="mini"><span class="lbl">Sentido</span><span><button type="button" data-all="sent">Todos</button><button type="button" data-none="sent">Ninguno</button></span></div>
+      <div class="chips" id="sent"></div>
+    </div>
+    <div class="foot"><a href="/admin" id="lnkAdmin" hidden>Administración</a><button id="salir">Salir</button></div>
+  </aside>
+  <main>
+    <div class="head"><h1 id="titulo">Elige los filtros</h1><span class="who" id="who"></span></div>
+    <div class="sel" id="sel"></div>
+    <div id="m" class="msg err" hidden></div>
+    <section class="kpis">
+      <div class="kpi"><b id="kE">0</b><span>vouchers (expediciones)</span></div>
+      <div class="kpi"><b id="kP">0</b><span>paraderos de control</span></div>
+      <div class="kpi"><b id="kH">0</b><span>hojas A4 aprox.</span></div>
+    </section>
+    <section class="panel scroll">
+      <table class="list"><thead><tr><th>Servicio</th><th>Sentido</th><th>Expediciones</th><th>Paraderos</th><th>Primera salida</th><th>Última salida</th></tr></thead>
+      <tbody id="tb"><tr><td colspan="6" class="empty">Elige ciclo, tipo de día, servicios y sentidos para ver qué saldrá en el PDF.</td></tr></tbody></table>
+    </section>
+    <div class="go"><button class="btn" id="pdf" disabled>Generar PDF</button><span class="note">Voucher A4: tarjetas recortables en 2 columnas.</span></div>
+  </main>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let yo=null, ultimo=null;
+const sel={serv:new Set(),sent:new Set()};
+
+function opciones(el,lista,valor,vacio){
+  el.innerHTML=(vacio?`<option value="">${vacio}</option>`:'')+lista.map(v=>`<option${String(v)===String(valor)?' selected':''}>${esc(v)}</option>`).join('');
+  el.disabled=!lista.length;
+}
+function chips(id,lista){
+  const s=sel[id];
+  [...s].forEach(v=>{if(!lista.includes(v))s.delete(v)});
+  $(id).innerHTML=lista.length?lista.map(v=>`<button type="button" class="chip" aria-pressed="${s.has(v)}" data-v="${esc(v)}">${esc(v)}</button>`).join('')
+    :'<span class="note" style="color:var(--side-lbl)">—</span>';
+  if(id==='serv')filtrar();
+}
+function filtrar(){const t=$('q').value.toLowerCase();$('serv').querySelectorAll('.chip').forEach(c=>c.hidden=!c.dataset.v.toLowerCase().includes(t))}
+function params(){return {unidad:$('unidad').value,ciclo:$('ciclo').value,tipo_dia:$('tipo').value,servicios:[...sel.serv],sentidos:[...sel.sent]}}
+function qs(p){return new URLSearchParams({...p,servicios:p.servicios.join(','),sentidos:p.sentidos.join(',')})}
+
+async function cargar(){
+  const p=params();
+  const r=await fetch('/api/filtros?'+qs(p)); if(r.status===401){location.href='/login';return}
+  const d=await r.json();
+  opciones($('unidad'),d.unidades,d.unidad??p.unidad,yo.rol==='admin'?'Elige unidad':null);
+  if(yo.rol!=='admin')$('unidad').disabled=true;
+  opciones($('ciclo'),d.ciclos,p.ciclo,d.ciclos.length?'Elige ciclo':'—');
+  opciones($('tipo'),d.tipos,p.tipo_dia,d.tipos.length?'Elige tipo de día':'—');
+  if(!d.ciclos.includes(p.ciclo))$('ciclo').value='';
+  if(!d.tipos.includes(p.tipo_dia))$('tipo').value='';
+  chips('serv',d.servicios);
+  if(sel.serv.size&&!sel.sent.size)d.sentidos.forEach(v=>sel.sent.add(v));
+  chips('sent',d.sentidos);
+  resumen();
+}
+async function resumen(){
+  const p=params(), ok=p.unidad&&p.ciclo&&p.tipo_dia&&p.servicios.length&&p.sentidos.length;
+  $('pdf').disabled=!ok;
+  $('titulo').textContent=p.unidad?`Unidad ${p.unidad}${p.ciclo?' · '+p.ciclo:''}${p.tipo_dia?' · '+p.tipo_dia:''}`:'Elige los filtros';
+  $('sel').innerHTML=[...p.servicios.map(s=>'Servicio '+s),...p.sentidos].map(x=>`<span>${esc(x)}</span>`).join('');
+  if(!ok){pinta({grupos:[],expediciones:0,paraderos:0});return}
+  const key=qs(p).toString(); ultimo=key;
+  const d=await (await fetch('/api/resumen?'+key)).json();
+  if(ultimo===key)pinta(d);
+}
+function hojas(g){ // misma geometría que el PDF: 2 columnas, ~782 pt útiles por hoja
+  let pts=0; g.forEach(x=>{pts+=Math.ceil(x.expediciones/2)*(56+x.max_paraderos*10)});
+  return Math.max(1,Math.ceil(pts/782));
+}
+function pinta(d){
+  $('kE').textContent=d.expediciones.toLocaleString('es-CL'); $('kP').textContent=d.paraderos; $('kH').textContent=d.grupos.length?hojas(d.grupos):0;
+  $('tb').innerHTML=d.grupos.length?d.grupos.map(g=>`<tr class="mono"><td>${esc(g.servicio)}</td><td>${esc(g.sentido)}</td><td>${g.expediciones}</td><td>${g.paraderos}</td><td>${esc(g.primera)}</td><td>${esc(g.ultima)}</td></tr>`).join('')
+    :'<tr><td colspan="6" class="empty">Elige ciclo, tipo de día, servicios y sentidos para ver qué saldrá en el PDF.</td></tr>';
+}
+['unidad','ciclo','tipo'].forEach(id=>$(id).addEventListener('change',()=>{
+  if(id==='unidad')$('ciclo').value=''; if(id!=='tipo')$('tipo').value='';
+  sel.serv.clear();sel.sent.clear();$('q').value='';cargar();
+}));
+['serv','sent'].forEach(id=>$(id).addEventListener('click',e=>{
+  const c=e.target.closest('.chip'); if(!c)return;
+  const v=c.dataset.v; sel[id].has(v)?sel[id].delete(v):sel[id].add(v);
+  c.setAttribute('aria-pressed',sel[id].has(v));
+  id==='serv'?cargar():resumen();
+}));
+document.querySelectorAll('[data-all],[data-none]').forEach(b=>b.addEventListener('click',()=>{
+  const id=b.dataset.all||b.dataset.none, todos=!!b.dataset.all;
+  $(id).querySelectorAll('.chip').forEach(c=>{if(c.hidden)return;todos?sel[id].add(c.dataset.v):sel[id].delete(c.dataset.v);c.setAttribute('aria-pressed',todos)});
+  id==='serv'?cargar():resumen();
+}));
+$('q').addEventListener('input',filtrar);
+$('pdf').addEventListener('click',async()=>{
+  const b=$('pdf'); b.disabled=true; b.textContent='Generando…'; $('m').hidden=true;
+  try{
+    const r=await fetch('/api/pdf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(params())});
+    if(r.status===401){location.href='/login';return}
+    if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.error||'No se pudo generar el PDF.')}
+    const blob=await r.blob(); const cd=r.headers.get('Content-Disposition')||''; const n=(cd.match(/filename="([^"]+)"/)||[])[1]||'voucher.pdf';
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=n; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  }catch(err){$('m').textContent=err.message;$('m').hidden=false}
+  finally{b.textContent='Generar PDF';b.disabled=false}
+});
+$('salir').addEventListener('click',async()=>{await fetch('/api/logout',{method:'POST'});location.href='/login'});
+(async()=>{
+  const r=await fetch('/api/me'); if(!r.ok){location.href='/login';return}
+  yo=await r.json(); $('who').textContent='Sesión: '+yo.nombre; $('lnkAdmin').hidden=yo.rol!=='admin';
+  cargar();
+})();
+</script>
+</body></html>

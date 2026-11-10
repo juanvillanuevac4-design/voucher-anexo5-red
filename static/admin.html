@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Administración · Voucher Anexo 5</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/static/base.css">
+<style>
+section.panel{padding:18px;display:grid;gap:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.row .field{flex:1 1 160px}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:22px;text-align:center;color:var(--muted);cursor:pointer}
+.drop.over{border-color:var(--brand);color:var(--ink)}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.inline{display:flex;gap:6px}
+.inline input{width:140px}
+</style></head>
+<body>
+<header class="top">
+  <div><b>ADMINISTRACIÓN · VOUCHER ANEXO 5</b><small>Consolidado Anexo-5 y accesos por unidad</small></div>
+  <nav><span class="who" id="who"></span><a href="/">Generar vouchers</a><button id="salir">Salir</button></nav>
+</header>
+<main class="wrap">
+  <div id="m" class="msg" hidden></div>
+
+  <section class="panel">
+    <div><h2>Consolidado Anexo-5</h2><p class="note">Sube el Anexo 5 de cada unidad (.xlsx). Se leen los encabezados de la fila 7 de la hoja "Horarios de pasada_completo"; las filas 1 a 6 se ignoran. Subir otra vez el anexo de una unidad reemplaza sus datos.</p></div>
+    <label class="drop" id="drop" for="files">Arrastra aquí los anexos o haz clic para elegirlos
+      <input type="file" id="files" accept=".xlsx" multiple hidden></label>
+    <div class="scroll"><table class="list"><thead><tr><th>Unidad</th><th>Filas</th><th>Expediciones</th><th>Servicios</th><th>Ciclos</th><th>Vigencia</th><th>Último archivo</th><th></th></tr></thead><tbody id="tU"></tbody></table></div>
+    <div><a class="btn sec sm" href="/api/admin/consolidado.csv" style="text-decoration:none;display:inline-block">Descargar Consolidado Anexo-5 (CSV)</a></div>
+  </section>
+
+  <section class="panel">
+    <div><h2>Accesos</h2><p class="note">Cada unidad ingresa con su clave y solo genera vouchers de su unidad. Los administradores ven todas.</p></div>
+    <form class="row" id="fNuevo">
+      <div class="field"><label for="nRol">Tipo</label><select id="nRol"><option value="unidad">Unidad</option><option value="admin">Administrador</option></select></div>
+      <div class="field" id="boxU"><label for="nUnidad">N° unidad</label><input id="nUnidad" type="number" min="1"></div>
+      <div class="field" id="boxUs" hidden><label for="nUsuario">Usuario</label><input id="nUsuario" type="text"></div>
+      <div class="field"><label for="nNombre">Nombre visible</label><input id="nNombre" type="text" placeholder="Unidad 18"></div>
+      <div class="field"><label for="nClave">Clave (mín. 6)</label><input id="nClave" type="text" autocomplete="off"></div>
+      <button class="btn">Crear acceso</button>
+    </form>
+    <div class="scroll"><table class="list"><thead><tr><th>Usuario</th><th>Nombre</th><th>Tipo</th><th>Estado</th><th>Último ingreso</th><th>Cambiar clave</th><th></th></tr></thead><tbody id="tA"></tbody></table></div>
+  </section>
+
+  <section class="panel">
+    <h2>Últimas descargas</h2>
+    <div class="scroll"><table class="list"><thead><tr><th>Fecha</th><th>Usuario</th><th>Unidad</th><th>Ciclo</th><th>Tipo día</th><th>Servicios</th><th>Sentidos</th><th>Formato</th><th>Exp.</th><th>Hojas</th></tr></thead><tbody id="tD"></tbody></table></div>
+  </section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fecha=s=>s?new Date(s).toLocaleString('es-CL',{dateStyle:'short',timeStyle:'short'}):'—';
+const dia=s=>s?s.slice(8,10)+'-'+s.slice(5,7)+'-'+s.slice(0,4):'—';
+let yo=null;
+function aviso(t,ok){const m=$('m');m.textContent=t;m.className='msg '+(ok?'ok':'err');m.hidden=false;window.scrollTo({top:0,behavior:'smooth'})}
+async function api(url,opt={}){
+  const r=await fetch(url,opt.body instanceof FormData?opt:{...opt,headers:{'Content-Type':'application/json'},body:opt.body&&JSON.stringify(opt.body)});
+  if(r.status===401){location.href='/login';throw new Error()}
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.error||'Algo falló. Intenta de nuevo.');
+  return d;
+}
+async function cargar(){
+  const d=await api('/api/admin/estado');
+  $('tU').innerHTML=d.unidades.length?d.unidades.map(u=>`<tr><td class="mono"><b>${u.unidad}</b></td><td class="mono">${u.filas.toLocaleString('es-CL')}</td><td class="mono">${u.expediciones.toLocaleString('es-CL')}</td><td class="mono">${u.servicios}</td><td>${esc(u.ciclos)}</td><td class="mono">${dia(u.fecha_inicio)} a ${dia(u.fecha_termino)}</td><td class="note">${esc(u.archivo)}<br>${fecha(u.cargado)}</td><td><button class="btn sec sm" data-borrar-u="${u.unidad}">Quitar</button></td></tr>`).join('')
+    :'<tr><td colspan="8" class="note">Aún no hay anexos cargados.</td></tr>';
+  $('tA').innerHTML=d.accesos.map(a=>`<tr><td class="mono">${esc(a.usuario)}</td><td>${esc(a.nombre)}</td><td>${a.rol==='admin'?'Administrador':'Unidad '+a.unidad}</td>
+    <td><span class="pill ${a.activo?'on':'off'}">${a.activo?'Activo':'Bloqueado'}</span></td><td class="note">${fecha(a.ultimo_ingreso)}</td>
+    <td><div class="inline"><input type="text" placeholder="Nueva clave" aria-label="Nueva clave para ${esc(a.usuario)}" data-clave="${a.id}" autocomplete="off"><button class="btn sec sm" data-guardar="${a.id}">Guardar</button></div></td>
+    <td><div class="acts">${a.id===yo.id?'<span class="note">Tu acceso</span>':`<button class="btn sec sm" data-activo="${a.id}" data-v="${a.activo?0:1}">${a.activo?'Bloquear':'Activar'}</button><button class="btn sec sm" data-borrar="${a.id}">Eliminar</button>`}</div></td></tr>`).join('');
+  $('tD').innerHTML=d.descargas.length?d.descargas.map(x=>`<tr><td class="note">${fecha(x.fecha)}</td><td>${esc(x.usuario)}</td><td class="mono">${x.unidad}</td><td>${esc(x.ciclo)}</td><td>${esc(x.tipo_dia)}</td><td class="mono">${esc(x.servicios)}</td><td>${esc(x.sentidos)}</td><td>${esc(x.formato)}</td><td class="mono">${x.expediciones}</td><td class="mono">${x.hojas}</td></tr>`).join('')
+    :'<tr><td colspan="10" class="note">Todavía no se generan PDF.</td></tr>';
+}
+async function subir(files){
+  if(!files.length)return;
+  const fd=new FormData(); [...files].forEach(f=>fd.append('archivos',f));
+  $('drop').textContent='Cargando '+files.length+' archivo(s)…';
+  try{
+    const d=await api('/api/admin/cargar',{method:'POST',body:fd});
+    const ok=d.resultados.filter(r=>!r.error), bad=d.resultados.filter(r=>r.error);
+    aviso([...ok.map(r=>`${r.archivo}: unidad ${r.unidades.join(', ')}, ${r.filas.toLocaleString('es-CL')} filas.`),...bad.map(r=>`${r.archivo}: ${r.error}`)].join(' '),!bad.length);
+  }catch(e){aviso(e.message)}
+  $('drop').innerHTML='Arrastra aquí los anexos o haz clic para elegirlos<input type="file" id="files" accept=".xlsx" multiple hidden>';
+  $('files').addEventListener('change',e=>subir(e.target.files));
+  cargar();
+}
+$('files').addEventListener('change',e=>subir(e.target.files));
+const dr=$('drop');
+dr.addEventListener('dragover',e=>{e.preventDefault();dr.classList.add('over')});
+dr.addEventListener('dragleave',()=>dr.classList.remove('over'));
+dr.addEventListener('drop',e=>{e.preventDefault();dr.classList.remove('over');subir(e.dataTransfer.files)});
+$('nRol').addEventListener('change',()=>{const a=$('nRol').value==='admin';$('boxU').hidden=a;$('boxUs').hidden=!a});
+$('fNuevo').addEventListener('submit',async e=>{
+  e.preventDefault();
+  try{await api('/api/admin/accesos',{method:'POST',body:{rol:$('nRol').value,unidad:$('nUnidad').value,usuario:$('nUsuario').value,nombre:$('nNombre').value,clave:$('nClave').value}});
+    aviso('Acceso creado.',true);e.target.reset();$('boxU').hidden=false;$('boxUs').hidden=true;cargar();}catch(err){aviso(err.message)}
+});
+document.addEventListener('click',async e=>{
+  const t=e.target, ds=t.dataset;
+  try{
+    if(ds.guardar){const i=document.querySelector(`[data-clave="${ds.guardar}"]`);await api('/api/admin/accesos/'+ds.guardar,{method:'POST',body:{clave:i.value}});aviso('Clave actualizada.',true);cargar();}
+    else if(ds.activo){await api('/api/admin/accesos/'+ds.activo,{method:'POST',body:{activo:ds.v==='1'}});cargar();}
+    else if(ds.borrar){if(t.dataset.conf!=='1'){t.dataset.conf='1';t.textContent='¿Confirmar?';return}await api('/api/admin/accesos/'+ds.borrar,{method:'DELETE'});aviso('Acceso eliminado.',true);cargar();}
+    else if(ds.borrarU){if(t.dataset.conf!=='1'){t.dataset.conf='1';t.textContent='¿Confirmar?';return}await api('/api/admin/unidad/'+ds.borrarU,{method:'DELETE'});aviso('Datos de la unidad '+ds.borrarU+' quitados del consolidado.',true);cargar();}
+  }catch(err){aviso(err.message)}
+});
+$('salir').addEventListener('click',async()=>{await fetch('/api/logout',{method:'POST'});location.href='/login'});
+(async()=>{const r=await fetch('/api/me');if(!r.ok){location.href='/login';return}yo=await r.json();$('who').textContent=yo.nombre;if(yo.rol!=='admin'){location.href='/';return}cargar();})();
+</script>
+</body></html>

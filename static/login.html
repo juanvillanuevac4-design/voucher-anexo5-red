@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ingreso · Voucher Anexo 5</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Mono&display=swap">
+<link rel="stylesheet" href="/static/base.css">
+<style>
+.box{max-width:380px;margin:9vh auto 0;padding:0 16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.card header{background:var(--head);color:var(--head-ink);padding:18px 20px}
+.card header b{font-size:17px}
+.card header small{display:block;opacity:.7;font-size:12px}
+form{padding:20px;display:grid;gap:14px}
+</style></head>
+<body>
+<div class="box"><div class="card">
+  <header><b>VOUCHER ANEXO 5 · SISTEMA RED</b><small>Ingresa con la clave de tu unidad</small></header>
+  <form id="f">
+    <div class="field"><label for="usuario">Unidad o usuario</label><select id="usuario" required></select></div>
+    <div class="field"><label for="clave">Clave</label><input id="clave" type="password" autocomplete="current-password" required></div>
+    <div id="m" class="msg err" hidden></div>
+    <button class="btn" id="b">Ingresar</button>
+  </form>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);
+fetch('/api/accesos-login').then(r=>r.json()).then(l=>{
+  $('usuario').innerHTML=l.map(a=>`<option value="${a.usuario}">${a.nombre.replace(/</g,'&lt;')}</option>`).join('');
+  if(!l.length){$('m').textContent='Aún no hay accesos creados. Configura ADMIN_CLAVE en el servidor.';$('m').hidden=false;}
+});
+$('f').addEventListener('submit',async e=>{
+  e.preventDefault();$('b').disabled=true;$('m').hidden=true;
+  const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:$('usuario').value,clave:$('clave').value})});
+  if(r.ok){location.href='/';return;}
+  const d=await r.json().catch(()=>({}));$('m').textContent=d.error||'No se pudo ingresar.';$('m').hidden=false;$('b').disabled=false;
+});
+</script>
+</body></html>
