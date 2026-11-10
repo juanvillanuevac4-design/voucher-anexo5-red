@@ -70,7 +70,7 @@ main{padding:22px max(18px,env(safe-area-inset-right)) 40px 22px;display:flex;fl
       <table class="list"><thead><tr><th>Servicio</th><th>Sentido</th><th>Expediciones</th><th>Paraderos</th><th>Primera salida</th><th>Última salida</th></tr></thead>
       <tbody id="tb"><tr><td colspan="6" class="empty">Elige ciclo, tipo de día, servicios y sentidos para ver qué saldrá en el PDF.</td></tr></tbody></table>
     </section>
-    <div class="go"><button class="btn" id="pdf" disabled>Generar PDF</button><span class="note">Voucher A4: tarjetas recortables en 2 columnas.</span></div>
+    <div class="go"><button class="btn" id="pdf" disabled>Generar PDF</button><span class="note">Voucher A4: 8 tarjetas recortables por hoja.</span></div>
   </main>
 </div>
 <script>
@@ -119,9 +119,8 @@ async function resumen(){
   const d=await (await fetch('/api/resumen?'+key)).json();
   if(ultimo===key)pinta(d);
 }
-function hojas(g){ // misma geometría que el PDF: 2 columnas, ~782 pt útiles por hoja
-  let pts=0; g.forEach(x=>{pts+=Math.ceil(x.expediciones/2)*(56+x.max_paraderos*10)});
-  return Math.max(1,Math.ceil(pts/782));
+function hojas(g){ // voucher 1: 8 tarjetas por hoja A4
+  return Math.ceil(g.reduce((a,x)=>a+x.expediciones,0)/8);
 }
 function pinta(d){
   $('kE').textContent=d.expediciones.toLocaleString('es-CL'); $('kP').textContent=d.paraderos; $('kH').textContent=d.grupos.length?hojas(d.grupos):0;

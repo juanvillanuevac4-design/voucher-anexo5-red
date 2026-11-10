@@ -2,7 +2,7 @@
 
 Formatos:
   tarjetas3  tarjetas compactas en 3 columnas (propuesta 2, por defecto)
-  tarjetas2  tarjetas con nombre de paradero en 2 columnas (propuesta 1)
+  tarjetas2  voucher elegido: 8 por hoja (2 columnas x 4 filas) con nombre de paradero (propuesta 1)
   planilla   una tabla por servicio y sentido: fila = expedición, columna = paradero (propuesta 3)
 La altura de cada tarjeta se ajusta a la cantidad de paraderos, así caben más por hoja.
 """
@@ -82,19 +82,33 @@ class _Doc:
 def _tarjetas(doc, exps, meta, cols):
     c = doc.c
     compacta = cols == 3
-    fs = 6.6 if compacta else 7.6       # tamaño de letra del cuerpo
-    lh = fs + 2.4                       # alto de cada fila de paradero
-    cab = 13 if compacta else 30        # encabezado de la tarjeta
-    sub = 9 if compacta else 0
-    th = lh
-    pad = 5
     gap = 6
+    pad = 6 if not compacta else 5
     ancho = (W - 2 * M - gap * (cols - 1)) / cols
     util_top = H - M
     util_bot = M + PIE
+    if not compacta:
+        # voucher 1: 8 por hoja (2 columnas x 4 filas), tarjetas de tamaño fijo
+        filas_hoja = 4
+        alto_fijo = (util_top - util_bot - gap * (filas_hoja - 1)) / filas_hoja
+        max_p = max((len(e["paraderos"]) for e in exps), default=1)
+        lh = min(14.0, (alto_fijo - 2 * pad - 40 - 4) / (max_p + 1))
+        fs = min(9.0, lh - 3)
+        for i, e in enumerate(exps):
+            pos = i % (cols * filas_hoja)
+            if i and pos == 0:
+                doc.nueva()
+            fila, col = divmod(pos, cols)
+            x = M + col * (ancho + gap)
+            y = util_top - fila * (alto_fijo + gap)
+            _tarjeta(c, x, y, ancho, alto_fijo, e, meta, False, fs, lh, 40, 0, pad)
+        return doc
+    fs = 6.6
+    lh = fs + 2.4
+    cab, sub = 13, 9
 
     def alto(e):
-        return pad * 2 + cab + sub + th + lh * len(e["paraderos"])
+        return pad * 2 + cab + sub + lh + lh * len(e["paraderos"])
 
     x_i, y = 0, util_top
     fila_alto = 0
@@ -139,28 +153,28 @@ def _tarjeta(c, x, y, w, h, e, meta, compacta, fs, lh, cab, sub, pad):
         y0 = top - cab - sub
         cols = [("Cód.", 0.22, "c"), ("Paradero", 0.58, "l"), ("Pasada", 0.20, "c")]
     else:
-        caja = 62
+        caja = 78
         c.setStrokeColor(black)
-        c.setLineWidth(0.6)
+        c.setLineWidth(0.7)
         c.rect(ix, top - cab, iw, cab)
         c.setFillColor(ROJO)
         c.rect(ix + iw - caja, top - cab, caja, cab, stroke=0, fill=1)
         c.setFillColor(white)
-        c.setFont("Helvetica-Bold", 5.6)
-        c.drawCentredString(ix + iw - caja / 2, top - 7, "SALIDA DESDE")
-        c.drawCentredString(ix + iw - caja / 2, top - 13, "CABEZAL")
-        c.rect(ix + iw - caja + 6, top - cab + 3, caja - 12, 11, stroke=0, fill=1)
+        c.setFont("Helvetica-Bold", 6.5)
+        c.drawCentredString(ix + iw - caja / 2, top - 8.5, "HORARIO DE SALIDA")
+        c.drawCentredString(ix + iw - caja / 2, top - 16, "DESDE CABEZAL")
+        c.rect(ix + iw - caja + 8, top - cab + 4, caja - 16, 15, stroke=0, fill=1)
         c.setFillColor(black)
-        c.setFont("Helvetica-Bold", 9)
-        c.drawCentredString(ix + iw - caja / 2, top - cab + 5.5, e["salida"] or "")
-        c.setFont("Helvetica", 7)
+        c.setFont("Helvetica-Bold", 12)
+        c.drawCentredString(ix + iw - caja / 2, top - cab + 7.5, e["salida"] or "")
+        c.setFont("Helvetica", 8.5)
         tw = iw - caja - 8
-        c.drawString(ix + 4, top - 8.5, _corta(f"Unidad: {meta['unidad']}   Ciclo: {meta['ciclo']}", "Helvetica", 7, tw))
-        c.drawString(ix + 4, top - 17, _corta(f"Servicio: {e['servicio']}   Sentido: {e['sentido']}", "Helvetica", 7, tw))
-        c.drawString(ix + 4, top - 25.5, _corta(f"Tipo día: {meta['tipo_dia']}   Expedición: {e['expedicion']}",
-                                               "Helvetica", 7, tw))
-        y0 = top - cab - 3
-        cols = [("Código paradero", 0.22, "c"), ("Nombre paradero", 0.56, "l"), ("Hora de pasada", 0.22, "c")]
+        c.drawString(ix + 5, top - 11, _corta(f"Unidad: {meta['unidad']}    Ciclo: {meta['ciclo']}", "Helvetica", 8.5, tw))
+        c.drawString(ix + 5, top - 22.5, _corta(f"Servicio: {e['servicio']}    Sentido: {e['sentido']}", "Helvetica", 8.5, tw))
+        c.drawString(ix + 5, top - 34, _corta(f"Tipo día: {meta['tipo_dia']}    Expedición: {e['expedicion']}",
+                                              "Helvetica", 8.5, tw))
+        y0 = top - cab - 4
+        cols = [("Código", 0.20, "c"), ("Nombre paradero", 0.56, "l"), ("Horario pasada", 0.24, "c")]
     # encabezado de tabla
     c.setFillColor(ROJO)
     c.rect(ix, y0 - lh, iw, lh, stroke=0, fill=1)
@@ -170,9 +184,9 @@ def _tarjeta(c, x, y, w, h, e, meta, compacta, fs, lh, cab, sub, pad):
     for t, p, al in cols:
         cw = iw * p
         if al == "l":
-            c.drawString(cx + 2, y0 - lh + 2.6, t)
+            c.drawString(cx + 2, y0 - lh + (lh - fs) / 2 + 1, t)
         else:
-            c.drawCentredString(cx + cw / 2, y0 - lh + 2.6, t)
+            c.drawCentredString(cx + cw / 2, y0 - lh + (lh - fs) / 2 + 1, t)
         cx += cw
     c.setFillColor(black)
     yy = y0 - lh
@@ -183,9 +197,9 @@ def _tarjeta(c, x, y, w, h, e, meta, compacta, fs, lh, cab, sub, pad):
             cw = iw * p
             c.setFont(f, fs)
             if al == "l":
-                c.drawString(cx + 2, yy + 2.6, _corta(val, f, fs, cw - 4))
+                c.drawString(cx + 2, yy + (lh - fs) / 2 + 1, _corta(val, f, fs, cw - 4))
             else:
-                c.drawCentredString(cx + cw / 2, yy + 2.6, _corta(val, f, fs, cw - 2))
+                c.drawCentredString(cx + cw / 2, yy + (lh - fs) / 2 + 1, _corta(val, f, fs, cw - 2))
             cx += cw
         c.setStrokeColor(LINEA)
         c.setLineWidth(0.3)
