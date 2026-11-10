@@ -6,7 +6,7 @@ Genera vouchers A4 en PDF a partir del **Consolidado Anexo-5**, que une los Anex
 
 - **Consolidado Anexo-5**: el administrador sube en `/admin` el Excel de cada unidad. Se lee la hoja `Horarios de pasada_completo`, se ignoran las filas 1 a 6 y los encabezados se toman de la fila 7. Las columnas se ubican por nombre de encabezado (no todas las unidades tienen las mismas letras: U2 trae "Código paradero TS" adicional). Subir de nuevo una unidad reemplaza sus datos. El consolidado se puede descargar como CSV.
 - **Filtros**: Unidad (col. B), Ciclo (encabezado "Tipo de Medición": col. P en U16/U18/U19, col. Q en U2), Tipo Día (col. F), Servicio (col. D, selección múltiple) y Sentido (col. E, selección múltiple). No hay filtro de hora de salida.
-- **PDF**: solo botón "Generar PDF". Voucher en tarjetas recortables, 8 por hoja A4 (2 columnas × 4 filas), una por expedición, con Unidad, Ciclo, Servicio, Sentido, Tipo día, Expedición, horario de salida desde cabezal y los paraderos con su horario de pasada.
+- **PDF**: solo botón "Generar PDF". Voucher en tarjetas recortables, 4 por hoja A4 (una columna, letra grande), una por expedición, con Unidad, Ciclo, Servicio, Sentido, Tipo día, Expedición, horario de salida desde cabezal y los paraderos con su horario de pasada.
 - **Accesos**: cada unidad ingresa con su clave (usuario `u<N>`) y solo ve e imprime su unidad. Los administradores ven todas, cargan anexos, crean/bloquean accesos y cambian claves. Cada PDF generado queda registrado en `descargas`.
 
 ## Configuración (Render)

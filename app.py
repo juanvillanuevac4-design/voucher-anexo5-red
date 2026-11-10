@@ -24,7 +24,7 @@ from anexos import COLUMNAS, AnexoError, leer_anexo
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
 ZONA = ZoneInfo(os.environ.get("ZONA_HORARIA", "America/Santiago"))
-FORMATO = "tarjetas2"  # voucher elegido: propuesta 1, tarjetas con nombre de paradero, 2 columnas
+FORMATO = "tarjetas1"  # voucher elegido: 1 columna, 4 por hoja, letra grande
 BASE = os.path.dirname(os.path.abspath(__file__))
 
 class _Json(DefaultJSONProvider):
