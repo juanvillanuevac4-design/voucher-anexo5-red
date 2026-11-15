@@ -65,7 +65,7 @@ async function cargar(){
   const d=await api('/api/admin/estado');
   $('tU').innerHTML=d.unidades.length?d.unidades.map(u=>`<tr><td class="mono"><b>${u.unidad}</b></td><td class="mono">${u.filas.toLocaleString('es-CL')}</td><td class="mono">${u.expediciones.toLocaleString('es-CL')}</td><td class="mono">${u.servicios}</td><td>${esc(u.ciclos)}</td><td class="mono">${dia(u.fecha_inicio)} a ${dia(u.fecha_termino)}</td><td class="note">${esc(u.archivo)}<br>${fecha(u.cargado)}</td><td><button class="btn sec sm" data-borrar-u="${u.unidad}">Quitar</button></td></tr>`).join('')
     :'<tr><td colspan="8" class="note">Aún no hay anexos cargados.</td></tr>';
-  $('tA').innerHTML=d.accesos.map(a=>`<tr><td class="mono">${esc(a.usuario)}</td><td>${esc(a.nombre)}</td><td>${a.rol==='admin'?'Administrador':'Unidad '+a.unidad}</td>
+  $('tA').innerHTML=d.accesos.map(a=>`<tr><td class="mono">${esc(a.usuario)}</td><td>${esc(a.nombre)}</td><td>${a.rol==='admin'?'Administrador':a.rol==='invitado'?'Invitado (demo)':'Unidad '+a.unidad}</td>
     <td><span class="pill ${a.activo?'on':'off'}">${a.activo?'Activo':'Bloqueado'}</span></td><td class="note">${fecha(a.ultimo_ingreso)}</td>
     <td><div class="inline"><input type="text" placeholder="Nueva clave" aria-label="Nueva clave para ${esc(a.usuario)}" data-clave="${a.id}" autocomplete="off"><button class="btn sec sm" data-guardar="${a.id}">Guardar</button></div></td>
     <td><div class="acts">${a.id===yo.id?'<span class="note">Tu acceso</span>':`<button class="btn sec sm" data-activo="${a.id}" data-v="${a.activo?0:1}">${a.activo?'Bloquear':'Activar'}</button><button class="btn sec sm" data-borrar="${a.id}">Eliminar</button>`}</div></td></tr>`).join('');

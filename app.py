@@ -99,6 +99,9 @@ CREATE TABLE IF NOT EXISTS descargas (
     hojas int,
     fecha timestamptz NOT NULL DEFAULT now()
 );
+-- Rol 'invitado': cuenta de demostración, ve todas las unidades y no administra nada
+ALTER TABLE accesos DROP CONSTRAINT IF EXISTS accesos_rol_check;
+ALTER TABLE accesos ADD CONSTRAINT accesos_rol_check CHECK (rol IN ('admin', 'unidad', 'invitado'));
 """
 
 
@@ -127,6 +130,12 @@ def iniciar():
                     "INSERT INTO accesos (usuario, nombre, rol, clave_hash) VALUES (%s, 'Administrador', 'admin', %s) "
                     "ON CONFLICT (usuario) DO UPDATE SET rol='admin', activo=true, clave_hash=EXCLUDED.clave_hash",
                     (usuario, generate_password_hash(clave)))
+            invitado = os.environ.get("INVITADO_CLAVE")
+            if invitado:
+                cx.execute(
+                    "INSERT INTO accesos (usuario, nombre, rol, clave_hash) VALUES ('invitado', 'Invitado', 'invitado', %s) "
+                    "ON CONFLICT (usuario) DO UPDATE SET rol='invitado', unidad=NULL, activo=true, clave_hash=EXCLUDED.clave_hash",
+                    (generate_password_hash(invitado),))
         _listo = True
 
 
@@ -261,7 +270,7 @@ def _lista(v):
 
 def _parametros(u, d):
     unidad = d.get("unidad")
-    if u["rol"] != "admin":
+    if u["rol"] not in ("admin", "invitado"):
         unidad = u["unidad"]
     try:
         unidad = int(unidad) if unidad not in (None, "") else None
@@ -286,7 +295,7 @@ def filtros(u):
     p = _parametros(u, request.args)
     out = {"unidad": p["unidad"]}
     with db() as cx:
-        if u["rol"] == "admin":
+        if u["rol"] in ("admin", "invitado"):
             out["unidades"] = [r["unidad"] for r in cx.execute(
                 "SELECT DISTINCT unidad FROM consolidado_anexo5 ORDER BY unidad").fetchall()]
         else:
