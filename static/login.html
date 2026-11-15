@@ -20,7 +20,9 @@ form{padding:20px;display:grid;gap:14px}
     <div id="m" class="msg err" hidden></div>
     <button class="btn" id="b">Ingresar</button>
   </form>
-</div></div>
+</div>
+<p class="note" style="text-align:center">Al ingresar aceptas los <a href="/terminos">Términos de uso</a> y la <a href="/privacidad">Política de privacidad</a>.</p>
+</div>
 <script>
 const $=id=>document.getElementById(id);
 fetch('/api/accesos-login').then(r=>r.json()).then(l=>{
