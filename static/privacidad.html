@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Política de Privacidad · Voucher Anexo 5</title>
+<link rel="stylesheet" href="/static/base.css">
+<style>
+.legal{max-width:780px;margin:0 auto;padding:24px 16px 56px}
+.legal h1{font-size:26px;margin-bottom:8px}.legal h2{font-size:18px;margin:28px 0 8px}
+.legal table{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0;display:block;overflow-x:auto}
+.legal th,.legal td{border:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+.legal th{background:var(--chip)}
+.legal blockquote{margin:12px 0;padding:10px 14px;border-left:4px solid var(--warn);background:var(--surface)}
+.legal code{font-family:var(--f-mono)}
+.legal a{color:var(--brand)}
+</style></head>
+<body>
+<header class="top"><div><b>VOUCHER ANEXO 5 · SISTEMA RED</b><small>Política de Privacidad</small></div>
+<nav><a href="/">Volver a la aplicación</a></nav></header>
+<main class="legal">
+<h1
+id="política-de-privacidad-y-tratamiento-de-datos-personales">Política
+de Privacidad y Tratamiento de Datos Personales</h1>
+<p><strong>Voucher Anexo 5 · Sistema Red</strong> · Versión 1.0 ·
+Vigente desde el [FECHA]</p>
+<blockquote>
+<p><strong>Borrador para revisión legal.</strong> Este texto fue
+preparado a partir del funcionamiento real de la aplicación y de las
+Leyes N° 19.628 y N° 21.719. Debe ser revisado y aprobado por un abogado
+antes de publicarse como definitivo. Los campos entre corchetes deben
+completarse.</p>
+</blockquote>
+<h2 id="1-quién-es-el-responsable">1. Quién es el responsable</h2>
+<p>El responsable del tratamiento de los datos personales es
+<strong>[RAZÓN SOCIAL]</strong>, RUT <strong>[RUT]</strong>, con
+domicilio en <strong>[DIRECCIÓN]</strong>, Chile (en adelante, "el
+Responsable").</p>
+<p>Para cualquier consulta o para ejercer sus derechos, escriba a
+<strong>[CORREO DE CONTACTO]</strong>.</p>
+<h2 id="2-a-quién-aplica-esta-política">2. A quién aplica esta
+política</h2>
+<p>La aplicación Voucher Anexo 5 (en adelante, "la Aplicación") es una
+herramienta de uso interno y profesional, destinada a las unidades de
+negocio y a los administradores autorizados para generar vouchers de
+horarios en PDF a partir de los Anexo 5. No está dirigida al público
+general ni a menores de edad.</p>
+<p>[COMPLETAR: indicar si la Aplicación es una herramienta oficial del
+Directorio de Transporte Público Metropolitano o una herramienta interna
+de un operador. Si no es oficial, agregar: "La Aplicación no es un canal
+oficial del Directorio de Transporte Público Metropolitano".]</p>
+<h2 id="3-qué-datos-tratamos">3. Qué datos tratamos</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Categoría</th>
+<th>Datos</th>
+<th>Origen</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cuenta de acceso</td>
+<td>Usuario (por ejemplo, <code>u16</code>), nombre visible, rol
+(administrador, unidad o invitado), unidad asignada, estado activo o
+bloqueado, fecha de creación y fecha del último ingreso</td>
+<td>Los crea un administrador</td>
+</tr>
+<tr class="even">
+<td>Clave</td>
+<td>Solo se guarda una huella criptográfica (hash) de la clave. La clave
+en texto nunca se almacena ni es visible para nadie, ni siquiera para
+los administradores</td>
+<td>El usuario o el administrador</td>
+</tr>
+<tr class="odd">
+<td>Registro de vouchers generados</td>
+<td>Por cada PDF: usuario, unidad, ciclo, tipo de día, servicios,
+sentidos, cantidad de expediciones y hojas, fecha y hora</td>
+<td>Se genera automáticamente al usar la Aplicación</td>
+</tr>
+<tr class="even">
+<td>Registro de cargas de anexos</td>
+<td>Nombre del archivo, unidad, usuario que lo cargó, fecha y hora</td>
+<td>Se genera automáticamente</td>
+</tr>
+<tr class="odd">
+<td>Datos técnicos</td>
+<td>Dirección IP, usada solo en la memoria del servidor durante un
+máximo de 5 minutos para bloquear intentos repetidos de ingreso
+fallidos. No se guarda en la base de datos. Cookie de sesión (ver
+sección 6)</td>
+<td>El navegador del usuario</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Contenido de los Anexo 5.</strong> Los anexos contienen
+información operacional (servicios, sentidos, expediciones, paraderos y
+horarios). La Aplicación solo lee esas columnas y no extrae datos de
+personas. [VERIFICAR que los archivos no incluyan nombres de conductores
+u otros datos personales.]</p>
+<p>La Aplicación no trata datos sensibles, no elabora perfiles y no toma
+decisiones automatizadas que produzcan efectos jurídicos sobre las
+personas.</p>
+<h2 id="4-para-qué-usamos-los-datos-y-con-qué-fundamento">4. Para qué
+usamos los datos y con qué fundamento</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Finalidad</th>
+<th>Fundamento legal</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Permitir el ingreso y limitar cada unidad a ver solo su
+información</td>
+<td>Ejecución de la relación contractual o de servicio entre el
+Responsable y la unidad o el usuario</td>
+</tr>
+<tr class="even">
+<td>Proteger la cuenta frente a accesos no autorizados (límite de
+intentos, revalidación del acceso)</td>
+<td>Interés legítimo del Responsable en la seguridad del sistema</td>
+</tr>
+<tr class="odd">
+<td>Llevar registro de qué vouchers se generaron y qué anexos se
+cargaron, para trazabilidad y control operacional</td>
+<td>Interés legítimo del Responsable en el control y la auditoría de la
+operación</td>
+</tr>
+<tr class="even">
+<td>Cumplir requerimientos de autoridades competentes</td>
+<td>Cumplimiento de una obligación legal</td>
+</tr>
+</tbody>
+</table>
+<p>No usamos los datos con fines comerciales, publicitarios ni de
+marketing, y no los vendemos ni cedemos.</p>
+<h2 id="5-con-quién-compartimos-los-datos">5. Con quién compartimos los
+datos</h2>
+<p>Los datos solo son visibles para los administradores de la
+Aplicación. Para funcionar, la Aplicación usa los siguientes
+proveedores, que actúan como encargados del tratamiento:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Proveedor</th>
+<th>Servicio</th>
+<th>Ubicación</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Render Services, Inc.</td>
+<td>Alojamiento del servidor. Registra técnicamente las solicitudes
+recibidas (IP, fecha, ruta) en sus registros de operación</td>
+<td>Estados Unidos (Virginia)</td>
+</tr>
+<tr class="even">
+<td>Neon Inc.</td>
+<td>Base de datos</td>
+<td>[COMPLETAR región; por defecto, Estados Unidos]</td>
+</tr>
+<tr class="odd">
+<td>Google LLC (Google Fonts)</td>
+<td>Tipografías de la interfaz. El navegador las descarga directamente
+desde Google, que recibe la dirección IP del usuario</td>
+<td>Estados Unidos y otros</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Transferencia internacional.</strong> Como estos proveedores
+operan fuera de Chile, los datos se transfieren al extranjero. El
+Responsable procura que estos proveedores ofrezcan garantías adecuadas
+de protección, mediante sus términos contractuales y acuerdos de
+tratamiento de datos. [VERIFICAR con el abogado las garantías exigidas
+por la Ley N° 21.719 para países sin nivel adecuado declarado por la
+Agencia.]</p>
+<h2 id="6-cookies">6. Cookies</h2>
+<p>La Aplicación usa <strong>una sola cookie, estrictamente
+necesaria</strong>, para mantener la sesión iniciada:</p>
+<ul>
+<li>Contiene el identificador, usuario, nombre, rol y unidad de la
+sesión, firmados para impedir su alteración.</li>
+<li>Es inaccesible para scripts (HttpOnly), solo viaja por conexión
+segura (Secure) y no se envía a otros sitios (SameSite=Lax).</li>
+<li>Expira a las 12 horas o al cerrar sesión.</li>
+</ul>
+<p>No usamos cookies de analítica, publicidad ni seguimiento. Por ser
+estrictamente necesaria, esta cookie no requiere consentimiento; si se
+bloquea, la Aplicación no funciona.</p>
+<h2 id="7-cuánto-tiempo-conservamos-los-datos">7. Cuánto tiempo
+conservamos los datos</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Datos</th>
+<th>Plazo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cuenta de acceso</td>
+<td>Mientras el acceso esté vigente. Al eliminar el acceso se borra su
+registro</td>
+</tr>
+<tr class="even">
+<td>Registros de vouchers y cargas</td>
+<td>[PLAZO PROPUESTO: 24 meses] desde su generación; luego se eliminan o
+anonimizan</td>
+</tr>
+<tr class="odd">
+<td>IP para límite de intentos</td>
+<td>Máximo 5 minutos, solo en memoria</td>
+</tr>
+<tr class="even">
+<td>Registros técnicos del proveedor de alojamiento</td>
+<td>Según la política de Render</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-cómo-protegemos-los-datos">8. Cómo protegemos los datos</h2>
+<ul>
+<li>Las claves se guardan solo como hash criptográfico con sal.</li>
+<li>Toda la comunicación viaja cifrada (HTTPS).</li>
+<li>Tras 10 intentos fallidos en 5 minutos desde una misma IP, el
+ingreso se bloquea temporalmente.</li>
+<li>Cada usuario solo accede a su unidad; las funciones de
+administración están restringidas por rol.</li>
+<li>Un acceso bloqueado o eliminado pierde la sesión en menos de un
+minuto.</li>
+</ul>
+<p>Ningún sistema es infalible. Si ocurre una vulneración de seguridad
+que afecte datos personales, el Responsable la comunicará a la Agencia
+de Protección de Datos Personales y, cuando corresponda, a los titulares
+afectados, en los términos de la ley.</p>
+<h2 id="9-sus-derechos">9. Sus derechos</h2>
+<p>Como titular de datos, usted puede solicitar:</p>
+<ul>
+<li><strong>Acceso</strong>: saber qué datos suyos tratamos.</li>
+<li><strong>Rectificación</strong>: corregir datos inexactos o
+incompletos.</li>
+<li><strong>Supresión</strong>: eliminar sus datos cuando ya no sean
+necesarios o no exista fundamento para tratarlos.</li>
+<li><strong>Oposición</strong>: oponerse a un tratamiento basado en
+interés legítimo.</li>
+<li><strong>Portabilidad</strong>: recibir sus datos en un formato
+estructurado y de uso común.</li>
+<li><strong>Bloqueo</strong>: suspender temporalmente el tratamiento
+mientras se resuelve una solicitud.</li>
+</ul>
+<p>Envíe su solicitud a <strong>[CORREO DE CONTACTO]</strong>, indicando
+su nombre, usuario y el derecho que desea ejercer. Responderemos dentro
+del plazo legal, [VERIFICAR: 30 días corridos, prorrogable por una vez
+por igual período, según la Ley N° 21.719]. El ejercicio de estos
+derechos es gratuito.</p>
+<p>Si su solicitud no es atendida, puede reclamar ante la
+<strong>Agencia de Protección de Datos Personales</strong> o ante los
+tribunales, conforme a la legislación vigente.</p>
+<h2 id="10-cambios-a-esta-política">10. Cambios a esta política</h2>
+<p>Podemos actualizar esta política cuando cambie la Aplicación o la
+ley. La versión vigente y su fecha siempre estarán publicadas en
+<code>/privacidad</code>. Si el cambio es relevante, lo informaremos a
+los usuarios dentro de la Aplicación.</p>
+<h2 id="11-normativa-aplicable">11. Normativa aplicable</h2>
+<p>Esta política se rige por la Ley N° 19.628 sobre Protección de la
+Vida Privada y por la Ley N° 21.719, que la modifica y regula la
+protección y el tratamiento de los datos personales y crea la Agencia de
+Protección de Datos Personales.</p>
+</main>
+</body></html>

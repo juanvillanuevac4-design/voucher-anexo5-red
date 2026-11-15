@@ -141,7 +141,7 @@ def iniciar():
 
 @app.before_request
 def _antes():
-    if request.endpoint not in ("salud", "estatico"):
+    if request.endpoint not in ("salud", "estatico", "privacidad", "terminos"):
         iniciar()
 
 
@@ -253,6 +253,16 @@ def admin_page(u):
 @app.get("/static/<path:p>", endpoint="estatico")
 def estatico(p):
     return send_from_directory(os.path.join(BASE, "static"), p, max_age=3600)
+
+
+@app.get("/privacidad", endpoint="privacidad")
+def privacidad():
+    return send_from_directory(os.path.join(BASE, "static"), "privacidad.html")
+
+
+@app.get("/terminos", endpoint="terminos")
+def terminos():
+    return send_from_directory(os.path.join(BASE, "static"), "terminos.html")
 
 
 @app.get("/healthz", endpoint="salud")
