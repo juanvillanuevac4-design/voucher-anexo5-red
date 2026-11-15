@@ -98,7 +98,7 @@ async function cargar(){
   const p=params();
   const r=await fetch('/api/filtros?'+qs(p)); if(r.status===401){location.href='/login';return}
   const d=await r.json();
-  opciones($('unidad'),d.unidades,d.unidad??p.unidad,yo.rol==='admin'?'Elige unidad':null);
+  opciones($('unidad'),d.unidades,d.unidad??p.unidad,yo.rol!=='unidad'?'Elige unidad':null);
   if(yo.rol!=='admin')$('unidad').disabled=true;
   opciones($('ciclo'),d.ciclos,p.ciclo,d.ciclos.length?'Elige ciclo':'—');
   opciones($('tipo'),d.tipos,p.tipo_dia,d.tipos.length?'Elige tipo de día':'—');
