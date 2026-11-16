@@ -299,3 +299,31 @@ def generar(filas, meta, formato, generado):
     else:
         _tarjetas(doc, exps, meta, {"tarjetas1": 1, "tarjetas2": 2}.get(formato, 3))
     return doc.cerrar(), len(exps), doc.pagina
+
+
+MAX_VISTA = 10
+
+
+def vista_previa(contenido, maximo=MAX_VISTA):
+    """Páginas del PDF como imágenes PNG (data URL) con marca de agua DEMO, para el perfil invitado."""
+    import base64
+    import pypdfium2 as pdfium
+    from PIL import Image, ImageDraw, ImageFont
+
+    doc = pdfium.PdfDocument(contenido)
+    total = len(doc)
+    paginas = []
+    for i in range(min(total, maximo)):
+        img = doc[i].render(scale=1.4).to_pil().convert("RGBA")
+        capa = Image.new("RGBA", img.size, (0, 0, 0, 0))
+        try:
+            fuente = ImageFont.load_default(size=int(img.width / 6))
+        except TypeError:
+            fuente = ImageFont.load_default()
+        ImageDraw.Draw(capa).text((img.width / 2, img.height / 2), "DEMO", font=fuente, anchor="mm", fill=(200, 30, 30, 70))
+        img = Image.alpha_composite(img, capa.rotate(35, center=(img.width / 2, img.height / 2))).convert("RGB")
+        buf = io.BytesIO()
+        img.save(buf, "PNG", optimize=True)
+        paginas.append("data:image/png;base64," + base64.b64encode(buf.getvalue()).decode())
+    doc.close()
+    return paginas, total

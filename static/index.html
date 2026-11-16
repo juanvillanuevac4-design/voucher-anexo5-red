@@ -38,6 +38,12 @@ main{padding:22px max(18px,env(safe-area-inset-right)) 40px 22px;display:flex;fl
 .go{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 @media (max-width:860px){.app{grid-template-columns:1fr}.servs{max-height:none}.foot{margin-top:0}}
 @media (max-width:520px){.kpis{grid-template-columns:1fr 1fr}}
+.vista{position:fixed;inset:0;z-index:50;background:rgba(15,23,42,.85);display:flex;flex-direction:column}
+.vista-h{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 16px;background:#fff}
+.vista-h span{flex:1;color:#555;font-size:.9em}
+.vista-b{overflow:auto;padding:16px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.vista-b img{max-width:min(900px,100%);background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.4);user-select:none;-webkit-user-drag:none}
+@media print{.vista{display:none}}
 </style></head>
 <body>
 <div class="app">
@@ -149,11 +155,19 @@ $('pdf').addEventListener('click',async()=>{
     const r=await fetch('/api/pdf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(params())});
     if(r.status===401){location.href='/login';return}
     if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.error||'No se pudo generar el PDF.')}
+    if((r.headers.get('Content-Type')||'').includes('json')){verVista(await r.json());return}
     const blob=await r.blob(); const cd=r.headers.get('Content-Disposition')||''; const n=(cd.match(/filename="([^"]+)"/)||[])[1]||'voucher.pdf';
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=n; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),5000);
   }catch(err){$('m').textContent=err.message;$('m').hidden=false}
   finally{b.textContent='Generar PDF';b.disabled=false}
 });
+function verVista(d){
+  const v=document.createElement('div'); v.className='vista';
+  v.innerHTML=`<div class="vista-h"><b>Vista previa (demo)</b><span>${d.paginas.length<d.total?`Primeras ${d.paginas.length} de ${d.total} hojas · `:''}El perfil invitado no descarga el PDF.</span><button class="btn" type="button">Cerrar</button></div><div class="vista-b">${d.paginas.map(s=>`<img src="${s}" alt="Hoja del voucher" draggable="false">`).join('')}</div>`;
+  v.addEventListener('contextmenu',e=>e.preventDefault());
+  v.querySelector('button').onclick=()=>v.remove();
+  document.body.appendChild(v);
+}
 $('salir').addEventListener('click',async()=>{await fetch('/api/logout',{method:'POST'});location.href='/login'});
 (async()=>{
   const r=await fetch('/api/me'); if(!r.ok){location.href='/login';return}
