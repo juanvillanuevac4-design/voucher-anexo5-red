@@ -375,6 +375,10 @@ def pdf(u):
         meta = {"unidad": p["unidad"], "ciclo": p["ciclo"], "tipo_dia": p["tipo_dia"]}
         ahora = dt.datetime.now(ZONA)
         contenido, n, hojas = voucher_pdf.generar(filas, meta, formato, ahora.strftime("%d-%m-%Y %H:%M"))
+        if u["rol"] == "invitado":
+            # Demo: el invitado solo ve el voucher en pantalla (imágenes con marca DEMO), sin archivo para descargar.
+            paginas, total = voucher_pdf.vista_previa(contenido)
+            return jsonify(vista=True, paginas=paginas, total=total, expediciones=n)
         cx.execute("INSERT INTO descargas (usuario, unidad, ciclo, tipo_dia, servicios, sentidos, formato, expediciones, hojas) "
                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                    (u["usuario"], p["unidad"], p["ciclo"], p["tipo_dia"], ",".join(p["servicios"]),
