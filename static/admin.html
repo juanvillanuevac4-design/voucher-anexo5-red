@@ -108,4 +108,5 @@ document.addEventListener('click',async e=>{
 $('salir').addEventListener('click',async()=>{await fetch('/api/logout',{method:'POST'});location.href='/login'});
 (async()=>{const r=await fetch('/api/me');if(!r.ok){location.href='/login';return}yo=await r.json();$('who').textContent=yo.nombre;if(yo.rol!=='admin'){location.href='/';return}cargar();})();
 </script>
+<footer class="note" style="text-align:center;padding:0 16px 24px"><a href="/terminos">Términos de uso</a> · <a href="/privacidad">Política de privacidad</a></footer>
 </body></html>
